@@ -1,0 +1,35 @@
+name: Build and Save Artifacts
+
+on:
+  workflow_dispatch:  # Only manual triggering
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3-venv
+        
+    - name: Run setup and build
+      run: |
+        chmod +x setup.sh
+        ./setup.sh
+        make results
+        
+    - name: Upload output files
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-output
+        path: output/
+        if-no-files-found: error  # Fail if no files are found
+        retention-days: 365  # Artifacts will be kept for 1 year 

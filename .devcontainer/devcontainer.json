@@ -1,0 +1,28 @@
+{
+    "name": "Python 3.12",
+    "image": "mcr.microsoft.com/devcontainers/python:3.12",
+    
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true,
+                "python.formatting.provider": "black"
+            }
+        }
+    },
+
+    "postCreateCommand": "chmod +x setup.sh && ./setup.sh",
+
+    "remoteUser": "vscode"
+} 
