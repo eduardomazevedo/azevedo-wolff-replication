@@ -6,9 +6,9 @@ Created on Thu Aug 29 13:52:30 2024
 """
 from scipy.integrate import simpson
 import numpy as np 
-from plotter import plotter
+from .plotter import plotter
 import inspect 
-from err_class import err
+from .err_class import err
 
 # define the problem class 
 class prob:

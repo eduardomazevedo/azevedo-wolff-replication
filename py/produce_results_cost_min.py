@@ -12,7 +12,7 @@ This is an old produce results file but we use it for the figures in section 5
 @author: Ilan
 """
 
-from cost_min import cost_min_prob
+from .cost_min import cost_min_prob
 from scipy.integrate import simpson  
 import matplotlib.pyplot as plt
 import imageio
@@ -82,7 +82,7 @@ def create_pareto_frontier(prob, ubar_grid,output_filename=None,
         plt.savefig(output_filename, dpi=300, bbox_inches='tight')
         print(f"Pareto Frontier saved as {output_filename}")
 
-    plt.show()
+    ()
    
 def create_gif(prob, aa_range, ubars, gif_filename="output.gif", duration=500):
     """
@@ -250,7 +250,7 @@ def create_combined_plot(prob, xx_range, yy_range, ubars,
     if output_filename and grid is None:
         plt.tight_layout()
         plt.savefig(output_filename)
-        plt.show()
+        ()
         print(f"Combined plot saved as {output_filename}") 
         
 # Basic plots 
@@ -348,7 +348,7 @@ def create_combined_plots_grid(inputs, grid_shape, row_titles=None, col_titles=N
     # Adjust layout and save the figure
     plt.tight_layout()
     plt.savefig(output_filename, bbox_inches="tight", pad_inches=0.02)
-    plt.show()
+    ()
     print(f"Combined grid plot saved as {output_filename}") 
 
 prob = cost_min_prob(a0=5,ubar=1,theta=1e-2,w0=2.5)

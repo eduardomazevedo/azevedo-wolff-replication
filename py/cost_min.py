@@ -16,8 +16,8 @@ from scipy.optimize import minimize, Bounds
 import copy, warnings 
 
 # import the prob_class 
-from prob_class import prob  # Now you can import prob from the parent directory
-from contract import contract 
+from .prob_class import prob  # Now importing from the same directory
+from .contract import contract 
 
 # define the cost_min_prob class 
 class cost_min_prob(prob):

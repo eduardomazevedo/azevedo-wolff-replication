@@ -108,7 +108,7 @@ class plotter:
         plt.grid(True)
         
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])  # Adjust layout to make room for the suptitle
-        plt.show()
+        ()
             
         results_dict = {
         'lambda': lambda_values,
@@ -132,7 +132,7 @@ class plotter:
         plt.ylabel(yaxis)
         plt.title(title)
         plt.grid(True)
-        plt.show() 
+        () 
         
     def plot_func_outcome(self, func, yaxis="", title="", yy_range=(0, 10), density=False):
         
@@ -163,7 +163,7 @@ class plotter:
             fig.tight_layout()  # Adjust the layout to make room for both y-axis labels
             plt.title(title)
             plt.grid(True)
-            plt.show()
+            ()
             
         # Discrete case
         elif self.prob.error.error_type == 'discrete':
@@ -195,7 +195,7 @@ class plotter:
             fig.tight_layout()
             plt.title(title)
             plt.grid(True)
-            plt.show() 
+            () 
                     
     def plot_func_effort_grid(self, vv, funcs, yaxes, titles, main_title="", aa_range=(0, 10)):
         """
@@ -229,7 +229,7 @@ class plotter:
         
         # Adjust layout to prevent overlap
         plt.tight_layout(rect=[0, 0, 1, 0.96])  # Adjust layout to make room for suptitle
-        plt.show()
+        ()
     
     def plot_pareto_frontier(self, ubar_grid, title="", path=""):
         # Initialize storage for two cases (relaxed and partially relaxed)
@@ -301,7 +301,7 @@ class plotter:
         plt.tight_layout() 
         if path: 
             plt.savefig(f'{path}.png', bbox_inches='tight') 
-        plt.show()
+        ()
 
         
         

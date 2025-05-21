@@ -15,12 +15,12 @@ results: results_cost_min results_opt_action
 # Generate cost minimization results
 results_cost_min:
 	@echo "Generating cost minimization results..."
-	source .venv/bin/activate && python -c "import matplotlib; matplotlib.use('Agg'); import produce_results_cost_min"
+	@source .venv/bin/activate && python -c "import matplotlib; matplotlib.use('Agg'); from py import produce_results_cost_min" || { echo "Error generating cost minimization results"; exit 1; }
 
 # Generate optimal action results
 results_opt_action:
 	@echo "Generating optimal action results..."
-	source .venv/bin/activate && python -c "import matplotlib; matplotlib.use('Agg'); import produce_results_opt_action"
+	@source .venv/bin/activate && python -c "import matplotlib; matplotlib.use('Agg'); from py import produce_results_opt_action" || { echo "Error generating optimal action results"; exit 1; }
 
 # Clean up generated files
 clean:

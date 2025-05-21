@@ -4,7 +4,7 @@ Created on Tue Feb 18 16:01:26 2025
 
 @author: Ilan
 """
-from cost_min import cost_min_prob 
+from .cost_min import cost_min_prob 
 import numpy as np  
 import matplotlib.pyplot as plt
 from scipy.integrate import simpson  
@@ -199,7 +199,7 @@ def create_combined_plot(prob_in, xx_range, yy_range, ubars, grid_a0, answer_key
     if output_filename and grid is None:
         plt.tight_layout()
         plt.savefig(output_filename)
-        plt.show()
+        ()
         print(f"Combined plot saved as {output_filename}") 
     
     # the answer key is only for problems where we optimize a 
@@ -264,7 +264,7 @@ def create_combined_plots_grid(inputs, grid_shape, answer_key={},
     # Adjust layout and save the figure
     plt.tight_layout()
     plt.savefig(output_filename, bbox_inches="tight", pad_inches=0.02)
-    plt.show()
+    ()
     print(f"Combined grid plot saved as {output_filename}") 
     
     return answer_key 
