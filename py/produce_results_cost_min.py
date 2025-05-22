@@ -265,7 +265,7 @@ u_ce_formatter = FuncFormatter(lambda value, pos:
 )
 
 
-"""
+
 create_pareto_frontier(prob,ubars_pf,output_filename="output/norm_log_pf.pdf",
                        tick_formatter_x = u_ce_formatter, 
                        tick_formatter_y=dol_20k_formatter)  
@@ -280,7 +280,7 @@ create_combined_plot(prob, aa_range, (0,7), ubars, xlab="Outcome",
                      output_filename="output/norm_log_con.pdf",
                      title="Wage Function for Different Reservation Utilities",
                      tick_formatter_x=dol_20k_formatter,
-                     tick_formatter_y=dol_20k_formatter) """ 
+                     tick_formatter_y=dol_20k_formatter)
 
 create_combined_plot(prob, (0,5), (0,1), ubars, xlab="Action", 
                      ylab="Probability $w(y) > 0$", plot_type = "prob", 
@@ -501,7 +501,7 @@ inputs_con = [{'prob': cost_min_prob(a0=5,ubar=1,theta=1e-2,w0=2.5),
          'tick_x': dol_20k_formatter,
          'tick_y': dol_20k_formatter}] 
 
-""" 
+
 create_combined_plots_grid(inputs_util, (4,3), 
                            row_titles=["Normal Distribution",
                                        "Exponential Distribution",
@@ -520,7 +520,7 @@ create_combined_plots_grid(inputs_con, (4,3),
                            output_filename="output/grid_contract_temp.pdf",
                            plot_type="contract",
                            title="Contracts")  
-""" 
+
 
 """
 prob =  
