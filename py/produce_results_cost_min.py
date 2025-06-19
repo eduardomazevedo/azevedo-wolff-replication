@@ -54,7 +54,7 @@ def create_pareto_frontier(prob, ubar_grid,output_filename=None,
         optimal_costs.append(optimal_cost)
         Us.append(ubar)
 
-    # Plot optimal costs against optimal utilities
+    # Plot optimal costs against optimal utilities (the pareto frontier)
     plt.figure(figsize=(8, 6))
     plt.plot(Us, optimal_costs, linestyle='-', linewidth=4, color='k', label="Pareto Frontier")
     plt.fill_between(Us, optimal_costs, y2=max(optimal_costs), color='gray', alpha=0.5)
@@ -74,7 +74,6 @@ def create_pareto_frontier(prob, ubar_grid,output_filename=None,
     
     plt.xlabel(r"Reservation Utility: $\bar{U}$", fontsize=16)
     plt.ylabel(r"Expected Wage: $\omega(\bar U)$", fontsize=16)
-    plt.title("Pareto Frontier of the Relaxed Problem", fontsize=16)
     plt.tight_layout()
     
     # Save
@@ -269,16 +268,15 @@ u_ce_formatter = FuncFormatter(lambda value, pos:
 create_pareto_frontier(prob,ubars_pf,output_filename="output/norm_log_pf.pdf",
                        tick_formatter_x = u_ce_formatter, 
                        tick_formatter_y=dol_20k_formatter)  
+# Plot expected utility versus action
 create_combined_plot(prob, aa_range, (.5,1.8), ubars, xlab="Action", 
                      ylab= "Expected Utility", 
                      output_filename="output/norm_log_util.pdf",
-                     title="Expected Utility vs Action for Different Reservation Utilities",
                      tick_formatter_x=dol_20k_formatter,
                      tick_formatter_y=None)
 create_combined_plot(prob, aa_range, (0,7), ubars, xlab="Outcome", 
                      ylab="Wage", plot_type = "contract", 
                      output_filename="output/norm_log_con.pdf",
-                     title="Wage Function for Different Reservation Utilities",
                      tick_formatter_x=dol_20k_formatter,
                      tick_formatter_y=dol_20k_formatter)
 

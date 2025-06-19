@@ -292,36 +292,36 @@ else:
 a0_grid = np.linspace(1e-3,10,20) 
 
 # solve gaussian log utility problem 
+# Plot wage function versus output
 create_combined_plot(prob, aa_range, (0,15), ubars, a0_grid, answer_key=answer_key,
                     xlab="Outcome", ylab="Wage", plot_type = "contract", 
                     output_filename="output/norm_log_con_opt_a.pdf",
-                    title="Wage Function for Different Reservation Utilities",
                     tick_formatter_x=dol_20k_formatter,
                     tick_formatter_y=dol_20k_formatter,
                     opt_a=True) 
 
+# Plot expected utility versus action
 create_combined_plot(prob, aa_range, (.35,1.6), ubars, a0_grid, answer_key=answer_key, 
                      xlab="Action", 
                      ylab= "Expected Utility", 
                      output_filename="output/norm_log_util_opt_a.pdf",
-                     title="Expected Utility vs Action for Different Reservation Utilities",
                      tick_formatter_x=dol_20k_formatter,
                      tick_formatter_y=None,
                      opt_a=True)    
 
 # look for lowest ubar such that foa is valid 
 ubars_small = [prob.u(i + prob.w0) for i in np.linspace(0, .1, 21)] 
+# Plot wage function versus output
 answer_key = create_combined_plot(prob, aa_range, (0,14), ubars_small, a0_grid, answer_key=answer_key,
                     xlab="Outcome", ylab="Wage", plot_type = "contract", 
                     output_filename="output/norm_log_con_checkfoa.pdf",
-                    title="Wage Function for Different Reservation Utilities",
                     tick_formatter_x=dol_20k_formatter,
                     tick_formatter_y=dol_20k_formatter) 
+# Plot expected utility versus action
 answer_key = create_combined_plot(prob, aa_range, (.35,1.6), ubars_small, a0_grid, answer_key=answer_key, 
                      xlab="Action", 
                      ylab= "Expected Utility", 
                      output_filename="output/norm_log_util_checkfoa.pdf",
-                     title="Expected Utility vs Action for Different Reservation Utilities",
                      tick_formatter_x=dol_20k_formatter,
                      tick_formatter_y=None) 
 
