@@ -19,10 +19,15 @@ build/
 
 # Project specific
 output/
+figures/
+tables/
 *.pkl
 *.pdf
 *.png
 *.gif
+
+# Data
+*.csv
 
 # OS specific
 .DS_Store
