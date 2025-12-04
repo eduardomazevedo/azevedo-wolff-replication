@@ -268,7 +268,7 @@ wheels = [
 [[package]]
 name = "moralhazard"
 version = "0.1.0"
-source = { git = "https://github.com/eduardomazevedo/moralhazard.git#b806ff3d5fb662752822623efaabc20461b09014" }
+source = { git = "https://github.com/eduardomazevedo/moralhazard.git#e298a32568f5906edc41a327fd28c3cbc5a7f1f3" }
 dependencies = [
     { name = "numpy" },
     { name = "pandas" },
