@@ -20,8 +20,8 @@ initial_wealth = 50
 sigma = 10.0
 first_best_effort = 100
 theta = 1.0 / first_best_effort / (first_best_effort + initial_wealth)
-
 def C(a): return theta * a ** 2 / 2
+
 def Cprime(a): return theta * a
 
 utility_cfg = make_utility_cfg("log", w0=initial_wealth)
@@ -29,8 +29,8 @@ dist_cfg = make_distribution_cfg("gaussian", sigma=sigma)
 
 comp_cfg = {
     "distribution_type": "continuous",
-    "y_min": 0.0   - 3 * sigma,
-    "y_max": 180.0 + 3 * sigma,
+    "y_min": 0.0   - 6 * sigma,
+    "y_max": 180.0 + 6 * sigma,
     "n": 201,  # must be odd
 }
 
@@ -39,10 +39,12 @@ cfg = {
     "computational_params": comp_cfg
 }
 
-reservation_wage_grid = np.linspace(-1.0, 50.0, 4)
-reservation_wage_grid_pareto = np.linspace(-10.0, 50.0, 100)
+reservation_wage_grid = np.linspace(-1.0, 50.0, 10)
+reservation_wage_grid_pareto = np.linspace(-20.0, 50.0, 100)
 a_min, a_max = 0.0, 180.0
 action_grid_plot = np.linspace(a_min, a_max, 100)
+
+n_a_iterations = 10
 
 mhp = MoralHazardProblem(cfg)
 
@@ -87,7 +89,6 @@ def plot_wage_functions(
     ax.set_xlabel("y")
     ax.set_ylabel("Wage Function")
     ax.set_title(title)
-    ax.grid(True, alpha=0.3)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
@@ -121,35 +122,73 @@ def plot_agent_utilities(
     # label positions
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
     
-    # Add horizontal lines through each red dot
-    for a_star, u_star in targets:
-        ax.axhline(y=u_star, color='gray', linestyle='-', linewidth=0.5, alpha=0.7, zorder=1)
+    # Add horizontal lines through each red dot (only when first order approach fails)
+    for i, (a_star, u_star) in enumerate(targets):
+        if not foa_flags[i]:
+            ax.axhline(y=u_star, color='gray', linestyle='-', linewidth=0.5, alpha=0.7, zorder=1)
+    
+    # Check which conditions exist
+    has_holds = any(foa_flags)
+    has_fails = any(not f for f in foa_flags)
+    
     x_text = xlim[0] + 0.08*(xlim[1]-xlim[0])
     y_text1 = ylim[1] - 0.05*(ylim[1]-ylim[0])
     y_text2 = ylim[1] - 0.12*(ylim[1]-ylim[0])
 
-    text_holds = ax.text(
-        x_text, y_text1, "first order approach holds",
-        bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
-        fontsize=10, va="top"
-    )
-    text_fails = ax.text(
-        x_text, y_text2, "first order approach fails",
-        bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
-        fontsize=10, va="top"
-    )
+    text_holds = None
+    text_fails = None
+    
+    if has_holds:
+        text_holds = ax.text(
+            x_text, y_text1, "first order approach holds",
+            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+            fontsize=10, va="top"
+        )
+    
+    if has_fails:
+        y_pos = y_text1 if not has_holds else y_text2
+        text_fails = ax.text(
+            x_text, y_pos, "first order approach fails",
+            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+            fontsize=10, va="top"
+        )
 
-    (x1, y1), (x2, y2) = arrow_positions_for_labels(ax, text_holds, text_fails)
+    # Compute arrow anchor positions
+    if has_holds and has_fails:
+        (x1, y1), (x2, y2) = arrow_positions_for_labels(ax, text_holds, text_fails)
+    elif has_holds:
+        fig = ax.figure
+        fig.canvas.draw()
+        bbox = text_holds.get_window_extent(fig.canvas.get_renderer())
+        trans = ax.transData.inverted()
+        x1, y1 = trans.transform((bbox.x1, bbox.y0 + bbox.height/2))
+        xlim = ax.get_xlim()
+        offset = (xlim[1] - xlim[0]) * 0.015
+        x1 = x1 + offset
+        x2, y2 = None, None
+    elif has_fails:
+        fig = ax.figure
+        fig.canvas.draw()
+        bbox = text_fails.get_window_extent(fig.canvas.get_renderer())
+        trans = ax.transData.inverted()
+        x2, y2 = trans.transform((bbox.x1, bbox.y0 + bbox.height/2))
+        xlim = ax.get_xlim()
+        offset = (xlim[1] - xlim[0]) * 0.015
+        x2 = x2 + offset
+        x1, y1 = None, None
 
+    # Draw arrows to appropriate text boxes
     for i, (a_star, u_star) in enumerate(targets):
-        anchor = (x1, y1) if foa_flags[i] else (x2, y2)
-        ax.annotate("", xy=(a_star, u_star), xytext=anchor,
-                    arrowprops=dict(arrowstyle="->", color="black", lw=0.8, alpha=0.5))
+        if foa_flags[i] and has_holds:
+            ax.annotate("", xy=(a_star, u_star), xytext=(x1, y1),
+                        arrowprops=dict(arrowstyle="->", color="black", lw=0.8, alpha=0.5))
+        elif not foa_flags[i] and has_fails:
+            ax.annotate("", xy=(a_star, u_star), xytext=(x2, y2),
+                        arrowprops=dict(arrowstyle="->", color="black", lw=0.8, alpha=0.5))
 
     ax.set_xlabel("Action")
     ax.set_ylabel("Agent Utility")
     ax.set_title(title)
-    ax.grid(True, alpha=0.3)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
@@ -180,8 +219,10 @@ def compute_principal_results():
             revenue_function=lambda a: a,
             reservation_utility=ru,
             a_min=a_min, a_max=a_max,
-            a_ic_lb=a_min, a_ic_ub=a_max
+            a_ic_lb=a_min, a_ic_ub=a_max,
+            n_a_iterations=n_a_iterations
         )
+
         sol_rel = mhp.solve_principal_problem(
             revenue_function=lambda a: a,
             reservation_utility=ru,
@@ -219,7 +260,8 @@ def compute_cost_minimization_results(intended_action):
             intended_action=intended_action,
             reservation_utility=ru,
             a_ic_lb=0.0,
-            a_ic_ub=100.0
+            a_ic_ub=100.0,
+            n_a_iterations=n_a_iterations
         )
         c = sol.optimal_contract
 
@@ -311,7 +353,8 @@ for ru in pareto_ru:
         intended_action=intended_action,
         reservation_utility=ru,
         a_ic_lb=0.0,
-        a_ic_ub=100.0
+        a_ic_ub=100.0,
+        n_a_iterations=n_a_iterations
     )
     Ew_pf.append(float(sol.constraints["Ewage"]))
 
@@ -330,7 +373,6 @@ plt.plot(pareto_ru, Ew_pf_rel, label="Relaxed Problem", linewidth=2, linestyle="
 plt.xlabel("Reservation Utility")
 plt.ylabel("Expected Wages")
 plt.title("Pareto Frontier: Expected Wages vs Reservation Utility")
-plt.grid(True, alpha=0.3)
 plt.legend()
 plt.tight_layout()
 plt.savefig("figures/pareto_frontier.png", dpi=300)
