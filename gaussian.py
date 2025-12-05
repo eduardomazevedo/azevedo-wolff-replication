@@ -17,8 +17,8 @@ os.makedirs('figures', exist_ok=True)
 # Primitives and configuration
 # -------------------------------------------------------------
 initial_wealth = 50
-sigma = 10.0
 first_best_effort = 100
+sigma = 10.0
 theta = 1.0 / first_best_effort / (first_best_effort + initial_wealth)
 def C(a): return theta * a ** 2 / 2
 
@@ -86,13 +86,13 @@ def plot_wage_functions(
             alpha=0.6, linewidth=0.8
         )
 
-    ax.set_xlabel("y")
-    ax.set_ylabel("Wage Function")
+    ax.set_xlabel("Output (USD 1,000s)")
+    ax.set_ylabel("Wage (USD 1,000s)")
     ax.set_title(title)
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    fig.colorbar(sm, ax=ax, label="Reservation Wage")  # colorbar fix
+    fig.colorbar(sm, ax=ax, label="Reservation Wage (USD 1,000s)")  # colorbar fix
 
     fig.tight_layout()
     fig.savefig(filename, dpi=300)
@@ -141,7 +141,6 @@ def plot_agent_utilities(
     if has_holds:
         text_holds = ax.text(
             x_text, y_text1, "first order approach holds",
-            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
             fontsize=10, va="top"
         )
     
@@ -149,7 +148,6 @@ def plot_agent_utilities(
         y_pos = y_text1 if not has_holds else y_text2
         text_fails = ax.text(
             x_text, y_pos, "first order approach fails",
-            bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
             fontsize=10, va="top"
         )
 
@@ -186,13 +184,45 @@ def plot_agent_utilities(
             ax.annotate("", xy=(a_star, u_star), xytext=(x2, y2),
                         arrowprops=dict(arrowstyle="->", color="black", lw=0.8, alpha=0.5))
 
-    ax.set_xlabel("Action")
-    ax.set_ylabel("Agent Utility")
+    ax.set_xlabel("Action (USD 1,000s)")
+    ax.set_ylabel("Agent expected utility (certain equivalent, USD 1,000s)")
     ax.set_title(title)
+
+    # Set y-axis ticks at natural certain equivalent values
+    # First, get the current y-axis range in utility values
+    ylim = ax.get_ylim()
+    u_min, u_max = ylim
+    
+    # Convert to certain equivalent range
+    ce_min = mhp.k(u_min)
+    ce_max = mhp.k(u_max)
+    
+    # Find all multiples of 10 in the certain equivalent range
+    # Start from the smallest multiple of 10 >= ce_min
+    start_tick = np.ceil(ce_min / 10) * 10
+    # End at the largest multiple of 10 <= ce_max
+    end_tick = np.floor(ce_max / 10) * 10
+    
+    # Generate all multiples of 10 in the range [start_tick, end_tick]
+    # np.arange works correctly with negative numbers
+    if start_tick <= end_tick:
+        # Include end_tick by going one step beyond
+        ce_ticks = np.arange(start_tick, end_tick + 10, 10)
+        # start_tick and end_tick are already the correct bounds, so all values are valid
+    else:
+        # If no multiples of 10 in range, use empty array
+        ce_ticks = np.array([])
+    
+    # Convert certain equivalent ticks back to utility values for positioning
+    if len(ce_ticks) > 0:
+        u_ticks = utility_cfg["u"](ce_ticks)
+        # Set the ticks and format labels
+        ax.set_yticks(u_ticks)
+        ax.set_yticklabels([f'{ce:.0f}' for ce in ce_ticks])
 
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     sm.set_array([])
-    fig.colorbar(sm, ax=ax, label="Reservation Wage")  # colorbar fix
+    fig.colorbar(sm, ax=ax, label="Reservation Wage (USD 1,000s)")  # colorbar fix
 
     fig.tight_layout()
     fig.savefig(filename, dpi=300)
@@ -367,13 +397,40 @@ for ru in pareto_ru:
     )
     Ew_pf_rel.append(float(sol_rel.constraints["Ewage"]))
 
-plt.figure(figsize=(10, 6))
-plt.plot(pareto_ru, Ew_pf, label="Full Problem", linewidth=2)
-plt.plot(pareto_ru, Ew_pf_rel, label="Relaxed Problem", linewidth=2, linestyle="--")
-plt.xlabel("Reservation Utility")
-plt.ylabel("Expected Wages")
-plt.title("Pareto Frontier: Expected Wages vs Reservation Utility")
-plt.legend()
-plt.tight_layout()
-plt.savefig("figures/pareto_frontier.png", dpi=300)
-plt.close()
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(pareto_ru, Ew_pf, label="Full Problem", linewidth=2)
+ax.plot(pareto_ru, Ew_pf_rel, label="Relaxed Problem", linewidth=2, linestyle="--")
+ax.set_xlabel("Agent expected utility (certain equivalent, USD 1,000s)")
+ax.set_ylabel("Expected Wages (USD 1,000s)")
+ax.set_title("Pareto Frontier: Expected Wages vs Agent Expected Utility")
+ax.legend()
+
+# Set x-axis ticks at natural certain equivalent values from reservation_wage_grid_pareto
+# Use a subset of reservation_wage_grid_pareto for nice tick locations
+# Select evenly spaced values that are nice round numbers
+ce_min, ce_max = reservation_wage_grid_pareto.min(), reservation_wage_grid_pareto.max()
+n_ticks = 8
+ce_ticks = np.linspace(ce_min, ce_max, n_ticks)
+# Round to nearest nice values
+tick_spacing = (ce_max - ce_min) / (n_ticks - 1)
+if tick_spacing >= 10:
+    round_to = 10
+elif tick_spacing >= 5:
+    round_to = 5
+else:
+    round_to = 1
+
+ce_ticks = np.round(ce_ticks / round_to) * round_to
+ce_ticks = np.unique(ce_ticks)  # Remove duplicates
+ce_ticks = ce_ticks[(ce_ticks >= ce_min) & (ce_ticks <= ce_max)]  # Keep within range
+
+# Convert certain equivalent ticks to utility values for positioning
+u_ticks = utility_cfg["u"](ce_ticks)
+
+# Set the ticks and format labels
+ax.set_xticks(u_ticks)
+ax.set_xticklabels([f'{ce:.0f}' for ce in ce_ticks])
+
+fig.tight_layout()
+fig.savefig("figures/pareto_frontier.png", dpi=300)
+plt.close(fig)
