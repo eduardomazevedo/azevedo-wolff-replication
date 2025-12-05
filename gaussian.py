@@ -14,6 +14,21 @@ from moralhazard.config_maker import make_utility_cfg, make_distribution_cfg
 os.makedirs('figures', exist_ok=True)
 
 # -------------------------------------------------------------
+# Color options for graphs
+# -------------------------------------------------------------
+COLORMAP = plt.cm.viridis
+SCATTER_COLOR = "red"
+HORIZONTAL_LINE_COLOR = "gray"
+ARROW_COLOR = "black"
+
+# -------------------------------------------------------------
+# Line width options for graphs
+# -------------------------------------------------------------
+PLOT_LINEWIDTH = 2
+HORIZONTAL_LINE_WIDTH = 0.5
+ARROW_LINEWIDTH = 0.8
+
+# -------------------------------------------------------------
 # Primitives and configuration
 # -------------------------------------------------------------
 initial_wealth = 50
@@ -73,7 +88,7 @@ def arrow_positions_for_labels(ax, text1, text2):
 def plot_wage_functions(
     filename, y_grid, wage_functions, reservation_wage_grid, foa_flags, title
 ):
-    cmap = plt.cm.viridis
+    cmap = COLORMAP
     norm = plt.Normalize(reservation_wage_grid.min(), reservation_wage_grid.max())
 
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -83,7 +98,7 @@ def plot_wage_functions(
             y_grid, wf,
             color=cmap(norm(reservation_wage_grid[i])),
             linestyle="-" if foa_flags[i] else "--",
-            alpha=0.6, linewidth=0.8
+            alpha=0.6, linewidth=PLOT_LINEWIDTH
         )
 
     ax.set_xlabel("Output (USD 1,000s)")
@@ -103,7 +118,7 @@ def plot_agent_utilities(
     filename, action_grid_plot, agent_utilities, targets,
     reservation_wage_grid, foa_flags, title
 ):
-    cmap = plt.cm.viridis
+    cmap = COLORMAP
     norm = plt.Normalize(reservation_wage_grid.min(), reservation_wage_grid.max())
 
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -114,10 +129,10 @@ def plot_agent_utilities(
             action_grid_plot, U,
             color=cmap(norm(reservation_wage_grid[i])),
             linestyle="-" if foa_flags[i] else "--",
-            alpha=0.6, linewidth=0.8
+            alpha=0.6, linewidth=PLOT_LINEWIDTH
         )
         a_star, u_star = targets[i]
-        ax.scatter(a_star, u_star, color="red", s=5, zorder=5)
+        ax.scatter(a_star, u_star, color=SCATTER_COLOR, s=5, zorder=5)
 
     # label positions
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
@@ -125,7 +140,7 @@ def plot_agent_utilities(
     # Add horizontal lines through each red dot (only when first order approach fails)
     for i, (a_star, u_star) in enumerate(targets):
         if not foa_flags[i]:
-            ax.axhline(y=u_star, color='gray', linestyle='-', linewidth=0.5, alpha=0.7, zorder=1)
+            ax.axhline(y=u_star, color=HORIZONTAL_LINE_COLOR, linestyle='-', linewidth=HORIZONTAL_LINE_WIDTH, alpha=0.7, zorder=1)
     
     # Check which conditions exist
     has_holds = any(foa_flags)
@@ -179,10 +194,10 @@ def plot_agent_utilities(
     for i, (a_star, u_star) in enumerate(targets):
         if foa_flags[i] and has_holds:
             ax.annotate("", xy=(a_star, u_star), xytext=(x1, y1),
-                        arrowprops=dict(arrowstyle="->", color="black", lw=0.8, alpha=0.5))
+                        arrowprops=dict(arrowstyle="->", color=ARROW_COLOR, lw=ARROW_LINEWIDTH, alpha=0.5))
         elif not foa_flags[i] and has_fails:
             ax.annotate("", xy=(a_star, u_star), xytext=(x2, y2),
-                        arrowprops=dict(arrowstyle="->", color="black", lw=0.8, alpha=0.5))
+                        arrowprops=dict(arrowstyle="->", color=ARROW_COLOR, lw=ARROW_LINEWIDTH, alpha=0.5))
 
     ax.set_xlabel("Action (USD 1,000s)")
     ax.set_ylabel("Agent expected utility (certain equivalent, USD 1,000s)")
@@ -398,8 +413,8 @@ for ru in pareto_ru:
     Ew_pf_rel.append(float(sol_rel.constraints["Ewage"]))
 
 fig, ax = plt.subplots(figsize=(10, 6))
-ax.plot(pareto_ru, Ew_pf, label="Full Problem", linewidth=2)
-ax.plot(pareto_ru, Ew_pf_rel, label="Relaxed Problem", linewidth=2, linestyle="--")
+ax.plot(pareto_ru, Ew_pf, label="Full Problem", linewidth=PLOT_LINEWIDTH)
+ax.plot(pareto_ru, Ew_pf_rel, label="Relaxed Problem", linewidth=PLOT_LINEWIDTH, linestyle="--")
 ax.set_xlabel("Agent expected utility (certain equivalent, USD 1,000s)")
 ax.set_ylabel("Expected Wages (USD 1,000s)")
 ax.set_title("Pareto Frontier: Expected Wages vs Agent Expected Utility")
