@@ -7,6 +7,7 @@ Gaussian log utility example — refactored and cleaned version.
 # -------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import os
 from moralhazard import MoralHazardProblem
 from moralhazard.config_maker import make_utility_cfg, make_distribution_cfg
@@ -16,7 +17,7 @@ os.makedirs('figures', exist_ok=True)
 # -------------------------------------------------------------
 # Color options for graphs
 # -------------------------------------------------------------
-COLORMAP = plt.cm.viridis
+COLORMAP = sns.dark_palette("#69d", reverse=False, as_cmap=True)
 SCATTER_COLOR = "red"
 HORIZONTAL_LINE_COLOR = "gray"
 ARROW_COLOR = "black"
@@ -54,7 +55,7 @@ cfg = {
     "computational_params": comp_cfg
 }
 
-reservation_wage_grid = np.linspace(-1.0, 50.0, 10)
+reservation_wage_grid = np.linspace(-1.0, 50.0, 6)
 reservation_wage_grid_pareto = np.linspace(-20.0, 50.0, 100)
 a_min, a_max = 0.0, 180.0
 action_grid_plot = np.linspace(a_min, a_max, 100)
