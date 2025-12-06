@@ -607,18 +607,51 @@ for ru in pareto_ru:
     Ew_pf_rel.append(float(sol_rel.constraints["Ewage"]))
 
 fig, ax = plt.subplots(figsize=(6, 3.375))  # 6 inches wide, 16:9 aspect ratio
-ax.plot(pareto_ru, Ew_pf, label="Full Problem", linewidth=PLOT_LINEWIDTH)
-ax.plot(pareto_ru, Ew_pf_rel, label="Relaxed Problem", linewidth=PLOT_LINEWIDTH, linestyle="--")
-ax.set_xlabel("Agent expected utility (certain equivalent, USD 1,000s)", fontsize=LABEL_FONT_SIZE)
-ax.set_ylabel("Expected Wages (USD 1,000s)", fontsize=LABEL_FONT_SIZE)
-ax.set_title("Pareto Frontier: Expected Wages vs Agent Expected Utility", fontsize=TITLE_FONT_SIZE)
-ax.tick_params(labelsize=FONT_SIZE)
-ax.legend(fontsize=FONT_SIZE)
 
-# Set x-axis ticks at natural certain equivalent values from reservation_wage_grid_pareto
-# Use a subset of reservation_wage_grid_pareto for nice tick locations
+# Convert to numpy arrays for easier manipulation
+pareto_ru = np.array(pareto_ru)
+Ew_pf = np.array(Ew_pf)
+Ew_pf_rel = np.array(Ew_pf_rel)
+
+# Define colors
+ghibli_palette_deep_teal = (59/255.0, 105/255.0, 120/255.0)  # RGB(59, 105, 120) normalized
+light_gray = (0.85, 0.85, 0.85)  # Light gray
+
+# Set x-axis limits to match CE range from -20 to 50 (converted to utility values)
+ce_min, ce_max = -20.0, 50.0
+u_min = utility_cfg["u"](ce_min)
+u_max = utility_cfg["u"](ce_max)
+ax.set_xlim(u_min, u_max)
+
+# Set y-axis limits with padding, then use top for fill_between
+y_min = 0.0  # Start from 0
+y_max = max(Ew_pf_rel.max(), Ew_pf.max()) * 1.1  # 10% padding above
+ax.set_ylim(y_min, y_max)
+# Get the actual top of the plot area after setting ylim
+y_top = ax.get_ylim()[1]
+
+# Plot relaxed problem (larger frontier) - black solid line
+# Fill area above the curve with light gray (all the way to top of plot)
+ax.fill_between(pareto_ru, Ew_pf_rel, y_top, color=light_gray, alpha=1.0, zorder=1)
+ax.plot(pareto_ru, Ew_pf_rel, color='black', linestyle='-', linewidth=PLOT_LINEWIDTH * 2, 
+        label="Relaxed Problem", zorder=2)
+
+# Plot full problem (smaller frontier) - dashed teal line with alpha=0.5
+# Fill area above the curve with light teal (alpha=0.5, all the way to top of plot)
+ax.fill_between(pareto_ru, Ew_pf, y_top, color=ghibli_palette_deep_teal, alpha=0.5, zorder=3)
+ax.plot(pareto_ru, Ew_pf, color=ghibli_palette_deep_teal, linestyle='--', linewidth=PLOT_LINEWIDTH * 2, 
+        label="Full Problem", alpha=0.5, zorder=4)
+
+ax.set_xlabel("Agent expected utility (certain equivalent, USD 1,000s)", fontsize=LABEL_FONT_SIZE)
+ax.set_ylabel("Expected Wage Cost (USD 1,000s)", fontsize=LABEL_FONT_SIZE)
+ax.set_title("Pareto Frontier: Expected Wage Cost vs Agent Expected Utility", fontsize=TITLE_FONT_SIZE)
+ax.tick_params(labelsize=FONT_SIZE)
+ax.legend(fontsize=FONT_SIZE, loc='lower right')
+
+# Set x-axis ticks at natural certain equivalent values
+# Use a subset of the CE range for nice tick locations
 # Select evenly spaced values that are nice round numbers
-ce_min, ce_max = reservation_wage_grid_pareto.min(), reservation_wage_grid_pareto.max()
+# (ce_min and ce_max already defined above)
 n_ticks = 8
 ce_ticks = np.linspace(ce_min, ce_max, n_ticks)
 # Round to nearest nice values
