@@ -1,4 +1,5 @@
 # Replication code for Azevedo and Wolff, 2025
+# Deprecated. New version at https://github.com/eduardomazevedo/azevedo-wolff-2025 
 
 ## Replication instructions
 - Run `setup.sh` to install python.
@@ -36,3 +37,4 @@ The following files produce results for the paper:
 - **produce_results_opt_action.py**: Generates the graphs with optimal actions shown in the introduction
 
 - **produce_results_cost_min.py**: Produces the cost minimization graphs presented in section 5
+
